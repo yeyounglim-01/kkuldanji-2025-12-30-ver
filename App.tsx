@@ -64,11 +64,6 @@ const App: React.FC = () => {
   };
 
   const handleGenerateHandover = async () => {
-    if (files.length === 0) {
-      alert("먼저 자료 보관함에 업무 파일을 추가해 주세요!");
-      return;
-    }
-    
     setIsProcessing(true);
     try {
       const data = await analyzeFilesForHandover(files);
@@ -106,13 +101,13 @@ const App: React.FC = () => {
               <div className="w-2.5 h-10 bg-yellow-400 rounded-full"></div>
               <div>
                 <h2 className="text-2xl font-black text-gray-800 tracking-tighter">인수인계 리포트 마스터</h2>
-                <p className="text-[10px] font-black text-yellow-600 uppercase tracking-[0.2em] mt-0.5">인터랙티브 인수인계 편집기</p>
+                <p className="text-[10px] font-black text-yellow-600 uppercase tracking-[0.2em] mt-0.5">INTERACTIVE HANDOVER MASTER</p>
               </div>
             </div>
             {!handoverData && (
               <button 
                 onClick={handleGenerateHandover}
-                disabled={isProcessing || files.length === 0}
+                disabled={isProcessing}
                 className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-xl hover:bg-black hover:scale-105 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2 group"
               >
                 {isProcessing ? "분석 중..." : "리포트 생성하기"}

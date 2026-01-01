@@ -1,6 +1,6 @@
 
 import React, { useRef, useState } from 'react';
-import { Plus, Search, File, Trash2, Image as ImageIcon, Archive, Database } from 'lucide-react';
+import { Plus, Search, File, Trash2, Image as ImageIcon, Archive, Database, ChevronDown } from 'lucide-react';
 import { SourceFile } from '../types';
 
 interface Props {
@@ -11,9 +11,7 @@ interface Props {
 
 const SourceSidebar: React.FC<Props> = ({ files, onUpload, onRemove }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // ★ 수정된 부분: 단일 선택에서 다중 선택(배열)으로 변경 ★
-  const [selectedKBs, setSelectedKBs] = useState<string[]>(['팀']); 
+  const [selectedKB, setSelectedKB] = useState<string>('필버디 - 벡엔드용'); 
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -43,22 +41,27 @@ const SourceSidebar: React.FC<Props> = ({ files, onUpload, onRemove }) => {
 
   const isImage = (mimeType: string) => mimeType.startsWith('image/');
 
-  const knowledgeBases = ['팀', '기획', 'B/E', 'F/E', 'Data/Model'];
-
-  // ★ 추가된 부분: 중복 선택 토글 함수 ★
-  const toggleKB = (kb: string) => {
-    setSelectedKBs(prev => 
-      prev.includes(kb) 
-        ? prev.filter(item => item !== kb) // 이미 있으면 제거
-        : [...prev, kb] // 없으면 추가
-    );
-  };
+  const knowledgeBases = [
+    '필버디 - 벡엔드용',
+    'json-test3',
+    '기획 자료실',
+    '프론트엔드 기술 스택',
+    '데이터/모델링 아카이브',
+    '공통 가이드라인'
+  ];
 
   return (
     <div className="w-80 h-full bg-white border-r flex flex-col p-5 shadow-sm relative overflow-hidden">
       <div className="mb-8 flex items-center gap-3 relative z-10">
-        <div className="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg rotate-3 border-2 border-yellow-500">
-           <span className="text-2xl">🍯</span>
+        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg rotate-3 border border-yellow-50 overflow-hidden group hover:rotate-0 transition-all duration-300">
+           <img 
+             src="https://i.ibb.co/PvGzg7cK/Gemini-Generated-Image-ip7k7xip7k7xip7k.png" 
+             alt="꿀단지" 
+             className="w-full h-full object-contain p-0.5 rounded-xl"
+             onError={(e) => {
+               e.currentTarget.src = "https://api.iconify.design/noto:honey-pot.svg";
+             }}
+           />
         </div>
         <div>
           <h1 className="text-xl font-extrabold text-gray-800 tracking-tight">꿀단지</h1>
@@ -109,25 +112,32 @@ const SourceSidebar: React.FC<Props> = ({ files, onUpload, onRemove }) => {
           </div>
         </div>
 
-        {/* 지식보관소 선택 (중복 선택 가능) */}
-        <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
-          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <Database className="w-3 h-3 text-yellow-500" /> 지식보관소 선택
+        {/* 지식보관소 선택 (이미지와 동일한 UI) */}
+        <div className="bg-white rounded-3xl p-5 border border-yellow-50 shadow-sm">
+          <h3 className="text-[11px] font-bold text-gray-400 mb-4 flex items-center gap-2">
+            <Database className="w-3.5 h-3.5 text-yellow-500" /> 지식보관소 선택
           </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {knowledgeBases.map((kb) => (
-              <button
-                key={kb}
-                onClick={() => toggleKB(kb)}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
-                  selectedKBs.includes(kb) // ★ 배열에 포함되어 있는지 확인 ★
-                  ? 'bg-yellow-400 text-white shadow-sm border border-yellow-400' 
-                  : 'bg-white text-gray-400 border border-gray-100 hover:border-yellow-200'
-                }`}
-              >
-                {kb}
-              </button>
-            ))}
+          <div className="relative mb-3 group/select">
+            <select 
+              value={selectedKB}
+              onChange={(e) => setSelectedKB(e.target.value)}
+              className="w-full pl-5 pr-10 py-3.5 bg-white border border-gray-100 rounded-2xl text-[13px] font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-yellow-400 outline-none transition-all shadow-sm cursor-pointer"
+            >
+              {knowledgeBases.map((kb) => (
+                <option key={kb} value={kb}>
+                  {kb}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <ChevronDown className="w-4 h-4" />
+            </div>
+          </div>
+          
+          <div className="bg-[#FFFDF0] px-4 py-2.5 rounded-xl border border-yellow-100/50">
+            <p className="text-[10px] font-bold text-yellow-600">
+              현재 인덱스: <span className="text-yellow-700 font-black">{selectedKB}</span>
+            </p>
           </div>
         </div>
 

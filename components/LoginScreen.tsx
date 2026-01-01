@@ -30,8 +30,15 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
 
       <div className="w-full max-w-md bg-white/80 backdrop-blur-2xl p-10 rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(252,211,77,0.2)] border border-white relative z-10 animate-in zoom-in-95 duration-700">
         <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-20 h-20 bg-yellow-400 rounded-3xl flex items-center justify-center text-white shadow-2xl rotate-6 mb-6 group hover:rotate-0 transition-all duration-500">
-             <span className="text-4xl group-hover:scale-125 transition-transform">🍯</span>
+          <div className="w-40 h-40 mb-4 group hover:scale-110 transition-all duration-500 cursor-pointer">
+             <img 
+               src="https://i.ibb.co/PvGzg7cK/Gemini-Generated-Image-ip7k7xip7k7xip7k.png" 
+               alt="꿀단지 로고" 
+               className="w-full h-full object-contain drop-shadow-2xl transition-transform rounded-full"
+               onError={(e) => {
+                 e.currentTarget.src = "https://api.iconify.design/noto:honey-pot.svg";
+               }}
+             />
           </div>
           <h1 className="text-3xl font-black text-gray-800 tracking-tighter">꿀단지 접속하기</h1>
           <p className="text-sm font-bold text-yellow-600 mt-2">당신의 업무를 가장 달콤하게 이어주는 AI</p>

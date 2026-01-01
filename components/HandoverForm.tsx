@@ -53,6 +53,7 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
     const keys = path.split('.');
     let current: any = newData;
     for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) current[keys[i]] = {};
       current = current[keys[i]];
     }
     current[keys[keys.length - 1]] = value;
@@ -64,8 +65,13 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
     const newData = JSON.parse(JSON.stringify(data));
     const keys = path.split('.');
     let current: any = newData;
-    for (const key of keys) current = current[key];
-    current.push(defaultItem);
+    for (const key of keys) {
+      if (!current[key]) current[key] = [];
+      current = current[key];
+    }
+    if (Array.isArray(current)) {
+      current.push(defaultItem);
+    }
     onUpdate(newData);
   }, [data, onUpdate]);
 
@@ -74,8 +80,13 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
     const newData = JSON.parse(JSON.stringify(data));
     const keys = path.split('.');
     let current: any = newData;
-    for (const key of keys) current = current[key];
-    current.splice(index, 1);
+    for (const key of keys) {
+      if (!current[key]) return;
+      current = current[key];
+    }
+    if (Array.isArray(current)) {
+      current.splice(index, 1);
+    }
     onUpdate(newData);
   }, [data, onUpdate]);
 
@@ -120,25 +131,25 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                 <h3 className="text-[10px] font-black text-amber-800 mb-4 flex items-center gap-2 uppercase tracking-widest">
                   <ChevronRight className="w-3 h-3" /> 인계자 정보
                 </h3>
-                <InputField label="이름" value={data.overview.transferor.name} onChange={(v:any) => handleChange('overview.transferor.name', v)} />
-                <InputField label="직급/부서" value={data.overview.transferor.position} onChange={(v:any) => handleChange('overview.transferor.position', v)} />
-                <InputField label="연락처" value={data.overview.transferor.contact} onChange={(v:any) => handleChange('overview.transferor.contact', v)} />
+                <InputField label="이름" value={data?.overview?.transferor?.name || ""} onChange={(v:any) => handleChange('overview.transferor.name', v)} />
+                <InputField label="직급/부서" value={data?.overview?.transferor?.position || ""} onChange={(v:any) => handleChange('overview.transferor.position', v)} />
+                <InputField label="연락처" value={data?.overview?.transferor?.contact || ""} onChange={(v:any) => handleChange('overview.transferor.contact', v)} />
               </div>
               <div className="p-6 bg-orange-50 rounded-[2rem] border border-orange-100 shadow-sm relative overflow-hidden group/card">
                 <h3 className="text-[10px] font-black text-orange-800 mb-4 flex items-center gap-2 uppercase tracking-widest">
                   <ChevronRight className="w-3 h-3" /> 인수자 정보
                 </h3>
-                <InputField label="이름" value={data.overview.transferee.name} onChange={(v:any) => handleChange('overview.transferee.name', v)} />
-                <InputField label="직급/부서" value={data.overview.transferee.position} onChange={(v:any) => handleChange('overview.transferee.position', v)} />
-                <InputField label="부임 예정일" value={data.overview.transferee.startDate} onChange={(v:any) => handleChange('overview.transferee.startDate', v)} />
+                <InputField label="이름" value={data?.overview?.transferee?.name || ""} onChange={(v:any) => handleChange('overview.transferee.name', v)} />
+                <InputField label="직급/부서" value={data?.overview?.transferee?.position || ""} onChange={(v:any) => handleChange('overview.transferee.position', v)} />
+                <InputField label="부임 예정일" value={data?.overview?.transferee?.startDate || ""} onChange={(v:any) => handleChange('overview.transferee.startDate', v)} />
               </div>
             </div>
 
             <div className="space-y-4">
-              <InputField label="인계 사유" value={data.overview.reason} multiline onChange={(v:any) => handleChange('overview.reason', v)} />
-              <InputField label="배경 정보 및 히스토리" value={data.overview.background} multiline onChange={(v:any) => handleChange('overview.background', v)} />
+              <InputField label="인계 사유" value={data?.overview?.reason || ""} multiline onChange={(v:any) => handleChange('overview.reason', v)} />
+              <InputField label="배경 정보 및 히스토리" value={data?.overview?.background || ""} multiline onChange={(v:any) => handleChange('overview.background', v)} />
               <div className="grid grid-cols-2 gap-6">
-                <InputField label="인계 기간" value={data.overview.period} onChange={(v:any) => handleChange('overview.period', v)} placeholder="예: 2024.01.01 ~ 2024.01.15" />
+                <InputField label="인계 기간" value={data?.overview?.period || ""} onChange={(v:any) => handleChange('overview.period', v)} placeholder="예: 2024.01.01 ~ 2024.01.15" />
               </div>
             </div>
           </div>
@@ -148,11 +159,11 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
         {activeTab === 1 && (
           <div className="space-y-8">
             <div className="p-8 bg-white border border-blue-50 rounded-[2.5rem] shadow-sm">
-              <InputField label="공식 직무명" value={data.jobStatus.title} onChange={(v:any) => handleChange('jobStatus.title', v)} />
-              <InputField label="핵심 책임 (줄바꿈으로 구분)" value={data.jobStatus.responsibilities.join('\n')} multiline onChange={(v:any) => handleChange('jobStatus.responsibilities', v.split('\n'))} />
+              <InputField label="공식 직무명" value={data?.jobStatus?.title || ""} onChange={(v:any) => handleChange('jobStatus.title', v)} />
+              <InputField label="핵심 책임 (줄바꿈으로 구분)" value={(data?.jobStatus?.responsibilities || []).join('\n')} multiline onChange={(v:any) => handleChange('jobStatus.responsibilities', v.split('\n'))} />
               <div className="grid grid-cols-2 gap-6">
-                <InputField label="의사결정 권한" value={data.jobStatus.authority} onChange={(v:any) => handleChange('jobStatus.authority', v)} />
-                <InputField label="보고 체계" value={data.jobStatus.reportingLine} onChange={(v:any) => handleChange('jobStatus.reportingLine', v)} />
+                <InputField label="의사결정 권한" value={data?.jobStatus?.authority || ""} onChange={(v:any) => handleChange('jobStatus.authority', v)} />
+                <InputField label="보고 체계" value={data?.jobStatus?.reportingLine || ""} onChange={(v:any) => handleChange('jobStatus.reportingLine', v)} />
               </div>
             </div>
 
@@ -162,13 +173,13 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
               <InputField 
                 label="팀 미션" 
                 labelColor="text-white"
-                value={data.jobStatus.teamMission} 
+                value={data?.jobStatus?.teamMission || ""} 
                 onChange={(v:any) => handleChange('jobStatus.teamMission', v)} 
               />
               <InputField 
                 label="현재 핵심 목표" 
                 labelColor="text-white"
-                value={data.jobStatus.teamGoals.join('\n')} 
+                value={(data?.jobStatus?.teamGoals || []).join('\n')} 
                 multiline 
                 onChange={(v:any) => handleChange('jobStatus.teamGoals', v.split('\n'))} 
               />
@@ -186,31 +197,31 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                 </h3>
               </div>
               <div className="grid gap-4">
-                {data.priorities.map((p, i) => (
+                {(data?.priorities || []).map((p, i) => (
                   <div key={`priority-${i}`} className="p-6 bg-white border border-red-50 rounded-3xl shadow-sm flex items-start gap-6 group/item hover:shadow-md transition-all relative">
                     <span className="w-8 h-8 bg-red-500 text-white rounded-xl flex items-center justify-center text-[10px] font-black shrink-0 shadow-lg">{i+1}</span>
                     <div className="flex-1 grid grid-cols-12 gap-6">
                       <div className="col-span-6">
                         <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">과제명</label>
-                        <input className="w-full text-xs font-black text-gray-800 outline-none bg-transparent" value={p.title} onChange={(e) => {
-                          const next = [...data.priorities];
-                          next[i].title = e.target.value;
+                        <input className="w-full text-xs font-black text-gray-800 outline-none bg-transparent" value={p.title || ""} onChange={(e) => {
+                          const next = [...(data?.priorities || [])];
+                          next[i] = { ...next[i], title: e.target.value };
                           handleChange('priorities', next);
                         }} />
                       </div>
                       <div className="col-span-3">
                         <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">상태</label>
-                        <input className="w-full text-[10px] font-bold text-gray-500 outline-none bg-transparent" value={p.status} onChange={(e) => {
-                          const next = [...data.priorities];
-                          next[i].status = e.target.value;
+                        <input className="w-full text-[10px] font-bold text-gray-500 outline-none bg-transparent" value={p.status || ""} onChange={(e) => {
+                          const next = [...(data?.priorities || [])];
+                          next[i] = { ...next[i], status: e.target.value };
                           handleChange('priorities', next);
                         }} />
                       </div>
                       <div className="col-span-3 text-right">
                         <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">기한</label>
-                        <input className="w-full text-[10px] font-black text-red-500 outline-none bg-transparent text-right" value={p.deadline} onChange={(e) => {
-                          const next = [...data.priorities];
-                          next[i].deadline = e.target.value;
+                        <input className="w-full text-[10px] font-black text-red-500 outline-none bg-transparent text-right" value={p.deadline || ""} onChange={(e) => {
+                          const next = [...(data?.priorities || [])];
+                          next[i] = { ...next[i], deadline: e.target.value };
                           handleChange('priorities', next);
                         }} />
                       </div>
@@ -227,17 +238,17 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                   <button onClick={() => addItem('stakeholders.internal', { name: '이름', role: '역할' })} className="p-1.5 bg-white rounded-lg text-gray-400 hover:text-yellow-600 shadow-sm transition-all"><Plus className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="space-y-2">
-                  {data.stakeholders.internal.map((s, i) => (
+                  {(data?.stakeholders?.internal || []).map((s, i) => (
                     <div key={`internal-${i}`} className="flex items-center gap-3 p-3 bg-white rounded-xl shadow-sm border border-gray-100 group/row">
                       <div className="flex-1">
-                        <input className="w-full text-[11px] font-black text-gray-800 outline-none" value={s.name} onChange={(e) => {
-                          const next = [...data.stakeholders.internal];
-                          next[i].name = e.target.value;
+                        <input className="w-full text-[11px] font-black text-gray-800 outline-none" value={s.name || ""} onChange={(e) => {
+                          const next = [...(data?.stakeholders?.internal || [])];
+                          next[i] = { ...next[i], name: e.target.value };
                           handleChange('stakeholders.internal', next);
                         }} />
-                        <input className="w-full text-[9px] font-bold text-gray-400 outline-none" value={s.role} onChange={(e) => {
-                          const next = [...data.stakeholders.internal];
-                          next[i].role = e.target.value;
+                        <input className="w-full text-[9px] font-bold text-gray-400 outline-none" value={s.role || ""} onChange={(e) => {
+                          const next = [...(data?.stakeholders?.internal || [])];
+                          next[i] = { ...next[i], role: e.target.value };
                           handleChange('stakeholders.internal', next);
                         }} />
                       </div>
@@ -252,19 +263,40 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                   <button onClick={() => addItem('teamMembers', { name: '이름', position: '직급', role: '역할', notes: '' })} className="p-1.5 bg-white rounded-lg text-blue-400 hover:text-blue-600 shadow-sm transition-all"><Plus className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="space-y-2">
-                  {data.teamMembers.map((m, i) => (
+                  {(data?.teamMembers || []).map((m, i) => (
                     <div key={`member-${i}`} className="p-3 bg-white rounded-xl shadow-sm border border-blue-100 group/row">
                       <div className="flex justify-between items-start">
-                        <input className="w-full text-[11px] font-black text-gray-800 outline-none" value={`${m.name} (${m.position})`} onChange={(e) => {
-                           const next = [...data.teamMembers];
-                           next[i].name = e.target.value;
-                           handleChange('teamMembers', next);
-                        }} />
+                        <div className="flex items-center gap-1 flex-1">
+                          <input 
+                            className="text-[11px] font-black text-gray-800 outline-none bg-transparent" 
+                            style={{ width: `${Math.max(30, (m.name || "").length * 10 + 10)}px` }}
+                            value={m.name || ""} 
+                            placeholder="이름"
+                            onChange={(e) => {
+                              const next = [...(data?.teamMembers || [])];
+                              next[i] = { ...next[i], name: e.target.value };
+                              handleChange('teamMembers', next);
+                            }} 
+                          />
+                          <span className="text-[11px] font-black text-gray-400">(</span>
+                          <input 
+                            className="text-[11px] font-black text-gray-800 outline-none bg-transparent"
+                            style={{ width: `${Math.max(30, (m.position || "").length * 10 + 10)}px` }} 
+                            value={m.position || ""} 
+                            placeholder="직급"
+                            onChange={(e) => {
+                              const next = [...(data?.teamMembers || [])];
+                              next[i] = { ...next[i], position: e.target.value };
+                              handleChange('teamMembers', next);
+                            }} 
+                          />
+                          <span className="text-[11px] font-black text-gray-400">)</span>
+                        </div>
                         <button onClick={() => removeItem('teamMembers', i)} className="opacity-0 group-hover/row:opacity-100 p-1.5 text-red-300 hover:text-red-500 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
-                      <input className="w-full text-[9px] font-bold text-blue-500 outline-none" value={m.role} onChange={(e) => {
-                        const next = [...data.teamMembers];
-                        next[i].role = e.target.value;
+                      <input className="w-full text-[9px] font-bold text-blue-500 outline-none" value={m.role || ""} onChange={(e) => {
+                        const next = [...(data?.teamMembers || [])];
+                        next[i] = { ...next[i], role: e.target.value };
                         handleChange('teamMembers', next);
                       }} />
                     </div>
@@ -283,45 +315,44 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
               <button onClick={() => addItem('ongoingProjects', { name: '새 프로젝트', owner: '담당자', status: '진행 중', progress: 0, deadline: '2024.12.31', description: '' })} className="flex items-center gap-1.5 text-[9px] font-black text-indigo-500 hover:text-indigo-700 transition-all"><Plus className="w-3 h-3" /> 추가</button>
             </div>
             <div className="grid gap-4">
-              {data.ongoingProjects.map((p, i) => (
+              {(data?.ongoingProjects || []).map((p, i) => (
                 <div key={`project-${i}`} className="p-6 bg-white border border-indigo-50 rounded-[2rem] shadow-sm hover:shadow-md transition-all relative group/item">
                   <button onClick={() => removeItem('ongoingProjects', i)} className="absolute top-4 right-4 opacity-0 group-hover/item:opacity-100 p-1.5 text-gray-300 hover:text-red-500 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center gap-3">
-                      <input className="text-sm font-black text-gray-800 outline-none bg-transparent" value={p.name} onChange={(e) => {
-                         const next = [...data.ongoingProjects];
-                         next[i].name = e.target.value;
+                      <input className="text-sm font-black text-gray-800 outline-none bg-transparent" value={p.name || ""} onChange={(e) => {
+                         const next = [...(data?.ongoingProjects || [])];
+                         next[i] = { ...next[i], name: e.target.value };
                          handleChange('ongoingProjects', next);
                       }} />
-                      <input className="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full outline-none" value={p.owner} onChange={(e) => {
-                         const next = [...data.ongoingProjects];
-                         next[i].owner = e.target.value;
+                      <input className="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full outline-none" value={p.owner || ""} onChange={(e) => {
+                         const next = [...(data?.ongoingProjects || [])];
+                         next[i] = { ...next[i], owner: e.target.value };
                          handleChange('ongoingProjects', next);
                       }} />
                     </div>
                     <div className="flex items-center gap-1.5">
-                       <input type="number" className="w-10 text-right text-xs font-black text-indigo-600 outline-none bg-transparent" value={p.progress} onChange={(e) => {
-                          const next = [...data.ongoingProjects];
-                          next[i].progress = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                       <input type="number" className="w-10 text-right text-xs font-black text-indigo-600 outline-none bg-transparent" value={p.progress || 0} onChange={(e) => {
+                          const next = [...(data?.ongoingProjects || [])];
+                          next[i] = { ...next[i], progress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) };
                           handleChange('ongoingProjects', next);
                        }} />
                        <span className="text-xs font-black text-indigo-600">%</span>
                     </div>
                   </div>
                   <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden mb-4 shadow-inner">
-                    <div className="bg-indigo-500 h-full transition-all duration-1000" style={{ width: `${p.progress}%` }}></div>
+                    <div className="bg-indigo-500 h-full transition-all duration-1000" style={{ width: `${p.progress || 0}%` }}></div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <InputField label="상태 / 기한" value={`${p.status} / ${p.deadline}`} onChange={(v:any) => {
-                       const next = [...data.ongoingProjects];
+                    <InputField label="상태 / 기한" value={`${p.status || ""} / ${p.deadline || ""}`} onChange={(v:any) => {
+                       const next = [...(data?.ongoingProjects || [])];
                        const parts = v.split(' / ');
-                       next[i].status = parts[0];
-                       if (parts[1]) next[i].deadline = parts[1];
+                       next[i] = { ...next[i], status: parts[0], deadline: parts[1] || next[i].deadline };
                        handleChange('ongoingProjects', next);
                     }} />
-                    <InputField label="상세 내용" value={p.description} onChange={(v:any) => {
-                       const next = [...data.ongoingProjects];
-                       next[i].description = v;
+                    <InputField label="상세 내용" value={p.description || ""} onChange={(v:any) => {
+                       const next = [...(data?.ongoingProjects || [])];
+                       next[i] = { ...next[i], description: v };
                        handleChange('ongoingProjects', next);
                     }} />
                   </div>
@@ -333,8 +364,8 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                <h3 className="text-xs font-black text-red-700 mb-4 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> 주요 이슈 및 리스크
               </h3>
-              <InputField label="현재 이슈" value={data.risks.issues} multiline onChange={(v:any) => handleChange('risks.issues', v)} />
-              <InputField label="잠재적 리스크" value={data.risks.risks} multiline onChange={(v:any) => handleChange('risks.risks', v)} />
+              <InputField label="현재 이슈" value={data?.risks?.issues || ""} multiline onChange={(v:any) => handleChange('risks.issues', v)} />
+              <InputField label="잠재적 리스크" value={data?.risks?.risks || ""} multiline onChange={(v:any) => handleChange('risks.risks', v)} />
             </div>
           </div>
         )}
@@ -349,24 +380,24 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                   <button onClick={() => addItem('resources.docs', { category: '분류', name: '문서명', location: '경로' })} className="p-1.5 bg-white rounded-lg text-emerald-400 hover:text-emerald-600 shadow-sm transition-all"><Plus className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="space-y-3">
-                  {data.resources.docs.map((d, i) => (
+                  {(data?.resources?.docs || []).map((d, i) => (
                     <div key={`doc-${i}`} className="p-3 bg-white rounded-xl shadow-sm text-[10px] border border-emerald-50 group/row">
                       <div className="flex justify-between mb-1">
-                        <input className="text-emerald-600 font-black outline-none bg-transparent" value={`[${d.category}]`} onChange={(e) => {
-                          const next = [...data.resources.docs];
-                          next[i].category = e.target.value.replace(/[\[\]]/g, '');
+                        <input className="text-emerald-600 font-black outline-none bg-transparent" value={`[${d.category || ""}]`} onChange={(e) => {
+                          const next = [...(data?.resources?.docs || [])];
+                          next[i] = { ...next[i], category: e.target.value.replace(/[\[\]]/g, '') };
                           handleChange('resources.docs', next);
                         }} />
                          <button onClick={() => removeItem('resources.docs', i)} className="opacity-0 group-hover/row:opacity-100 text-red-300 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
                       </div>
-                      <input className="w-full font-black text-gray-800 outline-none mb-0.5" value={d.name} onChange={(e) => {
-                        const next = [...data.resources.docs];
-                        next[i].name = e.target.value;
+                      <input className="w-full font-black text-gray-800 outline-none mb-0.5" value={d.name || ""} onChange={(e) => {
+                        const next = [...(data?.resources?.docs || [])];
+                        next[i] = { ...next[i], name: e.target.value };
                         handleChange('resources.docs', next);
                       }} />
-                      <input className="w-full text-gray-400 italic outline-none truncate" value={d.location} onChange={(e) => {
-                        const next = [...data.resources.docs];
-                        next[i].location = e.target.value;
+                      <input className="w-full text-gray-400 italic outline-none truncate" value={d.location || ""} onChange={(e) => {
+                        const next = [...(data?.resources?.docs || [])];
+                        next[i] = { ...next[i], location: e.target.value };
                         handleChange('resources.docs', next);
                       }} />
                     </div>
@@ -379,24 +410,24 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                   <button onClick={() => addItem('resources.systems', { name: '시스템명', usage: '용도', contact: '담당자' })} className="p-1.5 bg-white rounded-lg text-teal-400 hover:text-teal-600 shadow-sm transition-all"><Plus className="w-3.5 h-3.5" /></button>
                 </div>
                 <div className="space-y-3">
-                  {data.resources.systems.map((s, i) => (
+                  {(data?.resources?.systems || []).map((s, i) => (
                     <div key={`system-${i}`} className="p-3 bg-white rounded-xl shadow-sm text-[10px] border border-teal-50 group/row">
                        <div className="flex justify-between mb-1">
-                        <input className="font-black text-gray-800 outline-none" value={s.name} onChange={(e) => {
-                          const next = [...data.resources.systems];
-                          next[i].name = e.target.value;
+                        <input className="font-black text-gray-800 outline-none" value={s.name || ""} onChange={(e) => {
+                          const next = [...(data?.resources?.systems || [])];
+                          next[i] = { ...next[i], name: e.target.value };
                           handleChange('resources.systems', next);
                         }} />
-                        <button onClick={() => removeItem('resources.systems', i)} className="opacity-0 group-hover/row:opacity-100 text-red-300 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                        <button onClick={() => removeItem('resources.systems', i)} className="opacity-0 group-hover/row:opacity-100 text-red-300 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
-                      <input className="w-full text-teal-600 font-bold outline-none mb-0.5" value={s.usage} onChange={(e) => {
-                        const next = [...data.resources.systems];
-                        next[i].usage = e.target.value;
+                      <input className="w-full text-teal-600 font-bold outline-none mb-0.5" value={s.usage || ""} onChange={(e) => {
+                        const next = [...(data?.resources?.systems || [])];
+                        next[i] = { ...next[i], usage: e.target.value };
                         handleChange('resources.systems', next);
                       }} />
-                      <input className="w-full text-gray-400 italic outline-none" value={`문의: ${s.contact}`} onChange={(e) => {
-                        const next = [...data.resources.systems];
-                        next[i].contact = e.target.value.replace('문의: ', '');
+                      <input className="w-full text-gray-400 italic outline-none" value={`문의: ${s.contact || ""}`} onChange={(e) => {
+                        const next = [...(data?.resources?.systems || [])];
+                        next[i] = { ...next[i], contact: e.target.value.replace('문의: ', '') };
                         handleChange('resources.systems', next);
                       }} />
                     </div>
@@ -423,8 +454,8 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
               <div className="grid grid-cols-3 gap-10 pt-10 border-t border-white/20">
                 <div className="group/sig">
                   <input 
-                    className={`w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-sm font-black transition-all outline-none focus:border-white placeholder:text-white/40 ${(data.overview.transferor.name === "(전자서명)" || !data.overview.transferor.name) ? 'text-white/40' : 'text-white'}`}
-                    value={data.overview.transferor.name || "(전자서명)"}
+                    className={`w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-sm font-black transition-all outline-none focus:border-white placeholder:text-white/40 ${((data?.overview?.transferor?.name || "(전자서명)") === "(전자서명)") ? 'text-white/40' : 'text-white'}`}
+                    value={data?.overview?.transferor?.name || "(전자서명)"}
                     onChange={(e) => handleChange('overview.transferor.name', e.target.value)}
                     placeholder="(전자서명)"
                   />
@@ -432,8 +463,8 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                 </div>
                 <div className="group/sig">
                   <input 
-                    className={`w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-sm font-black transition-all outline-none focus:border-white placeholder:text-white/40 ${(data.overview.transferee.name === "(전자서명)" || !data.overview.transferee.name) ? 'text-white/40' : 'text-white'}`}
-                    value={data.overview.transferee.name || "(전자서명)"}
+                    className={`w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-sm font-black transition-all outline-none focus:border-white placeholder:text-white/40 ${((data?.overview?.transferee?.name || "(전자서명)") === "(전자서명)") ? 'text-white/40' : 'text-white'}`}
+                    value={data?.overview?.transferee?.name || "(전자서명)"}
                     onChange={(e) => handleChange('overview.transferee.name', e.target.value)}
                     placeholder="(전자서명)"
                   />
@@ -442,11 +473,11 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                 <div className="group/sig">
                   <input 
                     className="w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-[11px] font-black transition-all outline-none focus:border-white text-white"
-                    value={data.overview.period || new Date().toLocaleDateString()}
+                    value={data?.overview?.period || new Date().toLocaleDateString()}
                     onChange={(e) => handleChange('overview.period', e.target.value)}
                     placeholder="YYYY.MM.DD"
                   />
-                  <span className="text-[9px] font-black mt-2 block text-white/80 uppercase tracking-widest">일자: 2025. 12. 30.</span>
+                  <span className="text-[9px] font-black mt-2 block text-white/80 uppercase tracking-widest">일자</span>
                 </div>
               </div>
 
@@ -454,8 +485,8 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
               <div className="mt-12 flex justify-center">
                 <div className="group/sig w-64">
                   <input 
-                    className={`w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-sm font-black transition-all outline-none focus:border-white placeholder:text-white/40 ${(data.stakeholders.manager === "(전자서명)" || !data.stakeholders.manager) ? 'text-white/40' : 'text-white'}`}
-                    value={data.stakeholders.manager || "(전자서명)"}
+                    className={`w-full h-16 border-b-2 border-dashed border-white/40 bg-transparent text-center pb-2 text-sm font-black transition-all outline-none focus:border-white placeholder:text-white/40 ${((data?.stakeholders?.manager || "(전자서명)") === "(전자서명)") ? 'text-white/40' : 'text-white'}`}
+                    value={data?.stakeholders?.manager || "(전자서명)"}
                     onChange={(e) => handleChange('stakeholders.manager', e.target.value)}
                     placeholder="(전자서명)"
                   />
@@ -472,13 +503,13 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                  <button onClick={() => addItem('checklist', { text: '추가 확인 사항', completed: false })} className="text-[9px] font-black text-yellow-500 hover:text-yellow-600">+ 항목 추가</button>
               </div>
               <div className="space-y-3">
-                {data.checklist.map((c, i) => (
+                {(data?.checklist || []).map((c, i) => (
                   <div 
                     key={`check-${i}`} 
                     className={`group/row flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${c.completed ? 'bg-yellow-50 border-yellow-200 shadow-inner' : 'bg-gray-50 border-gray-100 hover:border-yellow-200'}`}
                     onClick={() => {
-                      const next = [...data.checklist];
-                      next[i].completed = !next[i].completed;
+                      const next = [...(data?.checklist || [])];
+                      next[i] = { ...next[i], completed: !next[i].completed };
                       handleChange('checklist', next);
                     }}
                   >
@@ -486,9 +517,9 @@ const HandoverForm: React.FC<Props> = ({ data, onUpdate }) => {
                       {c.completed && <CheckSquare className="w-4 h-4" />}
                     </div>
                     <div className="flex-1">
-                       <input className={`w-full text-xs font-black outline-none bg-transparent transition-all ${c.completed ? 'text-yellow-700/40 line-through' : 'text-gray-700'}`} value={c.text} onChange={(e) => {
-                         const next = [...data.checklist];
-                         next[i].text = e.target.value;
+                       <input className={`w-full text-xs font-black outline-none bg-transparent transition-all ${c.completed ? 'text-yellow-700/40 line-through' : 'text-gray-700'}`} value={c.text || ""} onChange={(e) => {
+                         const next = [...(data?.checklist || [])];
+                         next[i] = { ...next[i], text: e.target.value };
                          handleChange('checklist', next);
                        }} onClick={(e) => e.stopPropagation()} />
                     </div>
